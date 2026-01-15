@@ -1,0 +1,38 @@
+name: portfolio
+description: Portfolio app with Tailwind-inspired styling
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  url_launcher: ^6.1.14
+  flutter_animate: ^4.2.0
+  google_fonts: ^6.1.0
+  # --- ADDED FOR THEME & PERSISTENCE ---
+  provider: ^6.1.1
+  shared_preferences: ^2.2.2
+  go_router: ^13.2.0  # Added since we used it in the nav code
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  # --- ADDED FOR SPLASH SCREEN ---
+  flutter_native_splash: ^2.3.13
+
+# --- SPLASH SCREEN CONFIGURATION ---
+flutter_native_splash:
+  color: "#1A2B4C"
+  image: assets/images/logo.png # Ensure this file exists!
+  android_12:
+    color: "#1A2B4C"
+    image: assets/images/logo.png
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
