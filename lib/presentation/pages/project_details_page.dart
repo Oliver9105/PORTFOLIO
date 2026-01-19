@@ -15,6 +15,7 @@ class ProjectDetailsPage extends StatelessWidget {
         'title': 'STUDY GROUPS APP',
         'description': 'A collaborative learning platform that connects students for group study sessions. Features include real-time chat, session scheduling, and resource sharing.',
         'tech': ['React.js', 'Flask', 'Python', 'RESTful APIs'],
+        'category': 'Full Stack Web Application',
         'features': [
           {'title': 'Real-time Collaboration', 'desc': 'Implemented WebSockets for live group interactions.'},
           {'title': 'Session Management', 'desc': 'Built scheduling system with calendar integration.'},
@@ -27,6 +28,7 @@ class ProjectDetailsPage extends StatelessWidget {
         'title': 'BLOG SPACE',
         'description': 'A modern blogging platform with rich text editing, user authentication, and social features. Enables users to create, share, and discover content.',
         'tech': ['React.js', 'Python', 'Flask', 'PostgreSQL'],
+        'category': 'Full Stack Web Application',
         'features': [
           {'title': 'Rich Text Editor', 'desc': 'Implemented markdown support and media embedding.'},
           {'title': 'User Authentication', 'desc': 'Built secure login system with JWT tokens.'},
@@ -38,7 +40,8 @@ class ProjectDetailsPage extends StatelessWidget {
       '3': {
         'title': 'STEMLEARN',
         'description': 'An educational platform focused on STEM subjects. Provides interactive lessons, quizzes, and progress tracking for students.',
-        'tech': ['Full Stack', 'React.js', 'Python', 'MySQL'],
+        'tech': ['React.js', 'Python', 'Flask', 'MySQL'],
+        'category': 'Full Stack Web Application',
         'features': [
           {'title': 'Interactive Lessons', 'desc': 'Created engaging content with animations and examples.'},
           {'title': 'Quiz System', 'desc': 'Built assessment tools with instant feedback.'},
@@ -116,6 +119,23 @@ class ProjectDetailsPage extends StatelessWidget {
                         const SizedBox(width: 10),
                         _buildGithubButton(project['githubUrl'] as String),
                       ],
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF4EE3C0).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: const Color(0xFF4EE3C0).withOpacity(0.3)),
+                      ),
+                      child: Text(
+                        project['category'] as String,
+                        style: const TextStyle(
+                          color: Color(0xFF1A2B4C),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 20),
                     _buildTechStack(project['tech'] as List<String>),
