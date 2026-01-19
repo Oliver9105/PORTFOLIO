@@ -86,29 +86,97 @@ class _ProjectsDesktopPageState extends State<ProjectsDesktopPage> {
   }
 
   Widget _buildCategoryFilter(bool isDesktop) {
-    final categories = ["ALL", "MOBILE", "WEB", "UI/UX", "FLUTTER"];
+    final categories = {
+      "ALL": {"count": 3, "available": true},
+      "WEB": {"count": 3, "available": true},
+      "FULL STACK": {"count": 3, "available": true},
+      "MOBILE": {"count": 0, "available": false},
+      "UI/UX": {"count": 0, "available": false},
+      "FLUTTER": {"count": 0, "available": false},
+    };
+    
     return SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: isDesktop ? 40 : 20, vertical: 20),
       sliver: SliverToBoxAdapter(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: categories.map((cat) {
-              bool isMe = _activeCategory == cat;
-              return GestureDetector(
-                onTap: () => setState(() => _activeCategory = cat),
-                child: Container(
-                  margin: const EdgeInsets.only(right: 30),
-                  child: Column(
-                    children: [
-                      Text(cat, style: TextStyle(fontWeight: FontWeight.bold, color: isMe ? Colors.black : Colors.grey)),
-                      if (isMe) Container(height: 3, width: 25, color: const Color(0xFF4EE3C0), margin: const EdgeInsets.only(top: 4)),
-                    ],
-                  ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: categories.entries.map((entry) {
+                  String cat = entry.key;
+                  Map<String, dynamic> info = entry.value;
+                  bool isMe = _activeCategory == cat;
+                  bool isAvailable = info['available'];
+                  int count = info['count'];
+                  
+                  return GestureDetector(
+                    onTap: isAvailable ? () => setState(() => _activeCategory = cat) : null,
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 30),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                cat, 
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold, 
+                                  color: isAvailable 
+                                    ? (isMe ? Colors.black : Colors.grey) 
+                                    : Colors.grey.withOpacity(0.5)
+                                )
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '($count)', 
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: isAvailable 
+                                    ? Colors.grey 
+                                    : Colors.grey.withOpacity(0.5)
+                                )
+                              ),
+                            ],
+                          ),
+                          if (isMe && isAvailable) 
+                            Container(
+                              height: 3, 
+                              width: 25, 
+                              color: const Color(0xFF4EE3C0), 
+                              margin: const EdgeInsets.only(top: 4)
+                            ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+            if (!(categories[_activeCategory]!['available'] as bool))
+              Container(
+                margin: const EdgeInsets.only(top: 16),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.orange.withOpacity(0.3)),
                 ),
-              );
-            }).toList(),
-          ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.orange, size: 16),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'No ${_activeCategory.toLowerCase()} projects available yet. Coming soon!',
+                        style: TextStyle(color: Colors.orange[800], fontSize: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
         ),
       ),
     );
@@ -117,26 +185,40 @@ class _ProjectsDesktopPageState extends State<ProjectsDesktopPage> {
   Widget _buildProjectGrid(BuildContext context) {
     bool isDesktop = TWResponsive.isDesktop(context);
     
-    final projects = [
+    final allProjects = [
       {
         'title': 'Study Groups App',
         'tech': 'React.js • Flask',
+        'category': 'WEB',
+        'subcategory': 'FULL STACK',
         'liveUrl': 'https://fabulous-daifuku-b1a8fc.netlify.app/',
         'githubUrl': 'https://github.com/Oliver9105/study-groups-app.git',
       },
       {
         'title': 'Blog Space',
         'tech': 'React.js • Python',
+        'category': 'WEB',
+        'subcategory': 'FULL STACK',
         'liveUrl': 'https://oliver-blogspace.netlify.app/',
         'githubUrl': 'https://github.com/Oliver9105/Blogpost-APP.git',
       },
       {
         'title': 'STEMLearn',
-        'tech': 'Full Stack',
+        'tech': 'React.js • Python • MySQL',
+        'category': 'WEB',
+        'subcategory': 'FULL STACK',
         'liveUrl': 'https://superb-duckanoo-18547b.netlify.app/',
         'githubUrl': 'https://github.com/Zippy-sudo/STEMLearn_db.git',
       },
     ];
+    
+    // Filter projects based on active category
+    final projects = _activeCategory == "ALL" 
+      ? allProjects 
+      : allProjects.where((project) => 
+          project['category'] == _activeCategory || 
+          project['subcategory'] == _activeCategory
+        ).toList();
     
     return SliverPadding(
       padding: EdgeInsets.all(isDesktop ? 40 : 20),
