@@ -25,6 +25,46 @@ class _ContactPageState extends State<ContactPage> {
     super.dispose();
   }
 
+  void _launchUrl(String url) async {
+    if (url.startsWith('mailto:')) {
+      _sendEmailDirect(url.replaceFirst('mailto:', ''));
+      return;
+    }
+    
+    if (kIsWeb) {
+      html.window.open(url, '_blank');
+    } else {
+      final Uri uri = Uri.parse(url);
+      try {
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Could not open link: $e')),
+          );
+        }
+      }
+    }
+  }
+
+  void _sendEmailDirect(String email) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Email: $email'),
+          action: SnackBarAction(
+            label: 'Copy',
+            onPressed: () {
+              // Copy email to clipboard functionality can be added here
+            },
+          ),
+        ),
+      );
+    }
+  }
+
   void _sendEmail() async {
     final name = _nameController.text;
     final email = _emailController.text;
@@ -94,15 +134,26 @@ class _ContactPageState extends State<ContactPage> {
                         )
                       ],
                     ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Form Section
-                        Expanded(flex: 3, child: _buildContactForm()),
-                        const SizedBox(width: 40),
-                        // Socials Section
-                        Expanded(flex: 2, child: _buildSocialSection()),
-                      ],
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        bool isWide = constraints.maxWidth > 600;
+                        return isWide 
+                          ? Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(flex: 2, child: _buildContactForm()),
+                                const SizedBox(width: 40),
+                                Expanded(child: _buildSocialSection()),
+                              ],
+                            )
+                          : Column(
+                              children: [
+                                _buildContactForm(),
+                                const Divider(height: 60),
+                                _buildSocialSection(),
+                              ],
+                            );
+                      },
                     ),
                   ),
                 ),
@@ -165,14 +216,20 @@ class _ContactPageState extends State<ContactPage> {
 
   Widget _buildSocialSection() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text("CONNECT", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
         const SizedBox(height: 25),
-        _socialTile(Icons.link, "LinkedIn", "oliver-cheruiyot"),
-        _socialTile(Icons.code, "GitHub", "@Oliver9105"),
-        _socialTile(Icons.alternate_email, "Email", "olivercheruiyot09@gmail.com"),
-        const SizedBox(height: 40),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _socialIcon(Icons.business, "https://www.linkedin.com/in/oliver-cheruiyot-a807852b0", "LinkedIn"),
+            const SizedBox(width: 30),
+            _socialIcon(Icons.code_outlined, "https://github.com/Oliver9105", "GitHub"),
+            const SizedBox(width: 30),
+            _socialIcon(Icons.email_outlined, "mailto:olivercheruiyot09@gmail.com", "Email"),
+          ],
+        ),
+        const SizedBox(height: 30),
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
@@ -192,23 +249,18 @@ class _ContactPageState extends State<ContactPage> {
     );
   }
 
-  Widget _socialTile(IconData icon, String title, String subtitle) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
-      child: Row(
+  Widget _socialIcon(IconData icon, String url, String label) {
+    return GestureDetector(
+      onTap: () => _launchUrl(url),
+      child: Column(
         children: [
           CircleAvatar(
+            radius: 25,
             backgroundColor: const Color(0xFF1A2B4C),
-            child: Icon(icon, color: Colors.white, size: 18),
+            child: Icon(icon, color: Colors.white, size: 20),
           ),
-          const SizedBox(width: 15),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-              Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-            ],
-          )
+          const SizedBox(height: 8),
+          Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
         ],
       ),
     );
